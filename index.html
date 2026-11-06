@@ -39,15 +39,22 @@ nav.races button[aria-current=true]{background:var(--ink);color:#fff;border-colo
 .grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-top:16px}
 @media (max-width:860px){.grid{grid-template-columns:1fr}}
 .mapcard{position:relative}
+.mapstage{position:relative;overflow:hidden;border-radius:8px}
+.zoombar{position:absolute;top:8px;left:8px;right:8px;display:flex;align-items:center;gap:10px;pointer-events:none;opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s}
+.zoombar.on{opacity:1;transform:none}
+.zoombar button{pointer-events:auto;background:var(--ink);color:#fff;border:0;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.zoombar .zt{font-family:"Source Serif 4",Georgia,serif;font-size:22px;font-weight:700;color:var(--ink);text-shadow:0 0 6px #fff,0 0 6px #fff}
+svg.map .cl{font-weight:600;fill:#2b3240;paint-order:stroke;stroke:#fff;pointer-events:none}
+svg.map circle.pt{fill:#5d6472;pointer-events:none}
 .maptools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
 .maptools button{background:#f1eee8;border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:14px;color:var(--ink)}
 .maptools button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
 .maptools label{font-size:13px;color:var(--muted);margin-left:auto;display:flex;gap:5px;align-items:center}
 svg.map{width:100%;height:auto;display:block}
-svg.map path.dept{stroke:#fff;stroke-width:1.2;cursor:pointer;transition:fill .4s}
+svg.map path.dept{stroke:#fff;stroke-width:1.2;cursor:pointer;transition:fill .4s;vector-effect:non-scaling-stroke}
 svg.map path.dept:hover,svg.map path.dept:focus{stroke:var(--ink);stroke-width:2;outline:none}
 svg.map path.dept.sel{stroke:var(--ink);stroke-width:2.6}
-svg.map circle.b{fill:rgba(15,61,94,.55);stroke:#fff;stroke-width:.8;cursor:pointer}
+svg.map circle.b{fill:rgba(15,61,94,.55);stroke:#fff;stroke-width:.8;cursor:pointer;vector-effect:non-scaling-stroke}
 svg.map circle.b:hover{fill:rgba(15,61,94,.9)}
 svg.map circle.b.zero{fill:#fff;stroke:var(--empty);stroke-width:1.6}
 svg.map circle.b.sel{stroke:var(--ink);stroke-width:2.5}
@@ -129,7 +136,7 @@ footer{margin:30px 0 40px;font-size:13px;color:var(--muted);border-top:1px solid
   <div class="grid" id="mapgrid">
     <div class="card mapcard" id="mapcard">
       <div class="maptools" id="maptools"></div>
-      <svg class="map" id="map" viewBox="0 0 640 470" role="img"></svg>
+      <div class="mapstage"><svg class="map" id="map" viewBox="0 0 640 470" role="img"></svg><div class="zoombar" id="zoombar"><button id="zoomOut"></button><span class="zt" id="zoomTitle"></span></div></div>
       <div class="legend" id="legend"></div>
       <div class="tip" id="tip"></div>
     </div>
@@ -171,7 +178,7 @@ fr:{title:"Candidatures — Élections générales 2026",subtitle:"Haïti · Sta
  all:"Ensemble",president:"Président",senat:"Sénat",depute:"Députés",maire:"Maires",casec:"CASEC",asec:"ASEC",
  online:"Inscriptions en ligne",depot:"Dossiers déposés",dataAt:"Données au",source:"Source : site web du CEP",
  cands:"Candidats",cartels:"Cartels",women:"Femmes",structures:"Structures politiques",withdrawn:"Retirés depuis le début",
- covered:"{u} avec au moins un candidat",emptyDepot:"{u} sans dossier déposé",colPost:"Poste",empty:"{u} sans candidat",ofTotal:"sur {n}",perSeat:"Candidats par siège",perUnit:"Cartels par {u}",
+ covered:"{u} avec au moins un candidat",emptyDepot:"{u} sans dossier déposé",allMap:"← Toute la carte",colPost:"Poste",empty:"{u} sans candidat",ofTotal:"sur {n}",perSeat:"Candidats par siège",perUnit:"Cartels par {u}",
  depositsKpi:"Dossiers déposés",depositsPending:"Le dépôt physique des dossiers n'a pas encore commencé dans les données. Cette section se remplira automatiquement dès que des dossiers seront marqués comme déposés.",
  noDeposits:"Aucun dossier déposé pour l'instant.",
  vCount:"Nombre",vPerSeat:"Par siège",vWomen:"% femmes",vDepot:"% déposés",bubbles:"Bulles",
@@ -193,7 +200,7 @@ ht:{title:"Kandidati — Eleksyon jeneral 2026",subtitle:"Ayiti · Estatistik en
  all:"Tout ansanm",president:"Prezidan",senat:"Sena",depute:"Depite",maire:"Majistra",casec:"KASEK",asec:"ASEK",
  online:"Enskripsyon an liy",depot:"Dosye depoze",dataAt:"Done nan dat",source:"Sous : sit entènèt CEP",
  cands:"Kandida",cartels:"Katèl",women:"Fanm",structures:"Estrikti politik",withdrawn:"Retire depi kòmansman",
- covered:"{u} ki gen omwen yon kandida",emptyDepot:"{u} san dosye depoze",colPost:"Pòs",empty:"{u} san kandida",ofTotal:"sou {n}",perSeat:"Kandida pa syèj",perUnit:"Katèl pa {u}",
+ covered:"{u} ki gen omwen yon kandida",emptyDepot:"{u} san dosye depoze",allMap:"← Tout kat la",colPost:"Pòs",empty:"{u} san kandida",ofTotal:"sou {n}",perSeat:"Kandida pa syèj",perUnit:"Katèl pa {u}",
  depositsKpi:"Dosye depoze",depositsPending:"Depo fizik dosye yo poko kòmanse nan done yo. Seksyon sa a ap ranpli otomatikman depi yo make dosye kòm depoze.",
  noDeposits:"Pa gen dosye depoze pou kounye a.",
  vCount:"Kantite",vPerSeat:"Pa syèj",vWomen:"% fanm",vDepot:"% depoze",bubbles:"Boul",
@@ -312,7 +319,38 @@ const svg=d3.select("#map"); const W=640,H=470;
 const proj=d3.geoMercator().fitExtent([[10,10],[W-10,H-10]],GEO); const path=d3.geoPath(proj);
 svg.append("defs").append("pattern").attr("id","hatch").attr("width",6).attr("height",6).attr("patternUnits","userSpaceOnUse").attr("patternTransform","rotate(45)")
   .call(p=>{p.append("rect").attr("width",6).attr("height",6).attr("fill","#ebe7df");p.append("line").attr("y2",6).attr("stroke","#c9c3b7").attr("stroke-width",2);});
-const gD=svg.append("g"), gB=svg.append("g"), gL=svg.append("g"); const tip=document.getElementById("tip");
+const shadow=svg.select("defs").append("filter").attr("id","lift").attr("x","-20%").attr("y","-20%").attr("width","140%").attr("height","140%");
+const shadowFx=shadow.append("feDropShadow").attr("dx",0).attr("dy",1).attr("stdDeviation",3).attr("flood-color","#0f3d5e").attr("flood-opacity",.28);
+svg.append("rect").attr("width",W).attr("height",H).attr("fill","transparent").on("click",()=>{ if(state.dept) selectDept(null); });
+const gZ=svg.append("g");
+const gD=gZ.append("g"), gP=gZ.append("g"), gB=gZ.append("g"), gC=gZ.append("g"), gL=gZ.append("g"); const tip=document.getElementById("tip");
+let curK=1, zoomedDept=undefined;
+const zoom=d3.zoom().scaleExtent([1,30]).on("zoom",ev=>{ curK=ev.transform.k; gZ.attr("transform",ev.transform); applyK(); });
+svg.call(zoom).on(".zoom",null);   // zoom piloté uniquement par les clics (pas de molette : la page reste défilable)
+function applyK(){
+  const k=curK;
+  gB.selectAll("circle").attr("r",b=>b._r*(b._s??1)/k);
+  gP.selectAll("circle").attr("r",2.2/k);
+  gC.selectAll("text").style("font-size",(10/k)+"px").style("stroke-width",(3/k)+"px").attr("x",b=>b._x+(b._r*(b._s??1)+3)/k).attr("dy",3.5/k);
+  gL.selectAll("text").style("font-size",(11/k)+"px").style("stroke-width",(3/k)+"px");
+  shadowFx.attr("stdDeviation",3/k).attr("dy",1/k);
+}
+function zoomK(d){ const f=GEO.features.find(x=>x.properties.code===d); const [[x0,y0],[x1,y1]]=path.bounds(f); return Math.min(14,0.86/Math.max((x1-x0)/W,(y1-y0)/(H-40))); }
+/* Évite que les noms se chevauchent : on garde d'abord les plus grosses bulles */
+function declutter(P,k){
+  const placed=[]; const order=P.slice().sort((a,b)=>(b.n??0)-(a.n??0));
+  for(const b of order){ const name=unitName(b.u,b.k); const x=b._x*k+b._r+3, y=b._y*k-7, w=name.length*5.6, h=13;
+    const hit=placed.some(q=>x<q.x+q.w&&x+w>q.x&&y<q.y+q.h&&y+h>q.y) || P.some(o=>o!==b && Math.hypot(o._x*k-(x+w/2),o._y*k-(y+h/2))<o._r && false);
+    b._lab=!hit; if(!hit) placed.push({x,y,w,h}); }
+}
+function zoomTo(d,animate=true){
+  let tr=d3.zoomIdentity;
+  if(d){ const f=GEO.features.find(x=>x.properties.code===d); const [[x0,y0],[x1,y1]]=path.bounds(f);
+    const k=Math.min(14,0.86/Math.max((x1-x0)/W,(y1-y0)/(H-40)));
+    tr=d3.zoomIdentity.translate(W/2,(H+30)/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2); }
+  if(animate) svg.transition().duration(950).ease(d3.easeCubicInOut).call(zoom.transform,tr);
+  else svg.call(zoom.transform,tr);
+}
 gD.selectAll("path").data(GEO.features).join("path").attr("class","dept").attr("d",path).attr("tabindex",0).attr("role","button")
   .on("mousemove",(e,f)=>deptTip(e,f.properties.code)).on("mouseleave",()=>tip.style.opacity=0)
   .on("click",(e,f)=>selectDept(f.properties.code))
@@ -338,9 +376,13 @@ function renderMap(){
   }
   const nums=Object.values(vals).filter(v=>v!=null&&v>0); const lo=state.view==="women"||state.view==="depot"?0:d3.min(nums)||0; const hi=state.view==="depot"?1:(d3.max(nums)||1);
   const sc=d3.scaleLinear().domain([lo,hi]).range([0.08,1]).clamp(true); const ramp=d3.interpolateRgb(...RAMP[state.view]);
-  gD.selectAll("path").attr("fill",f=>{const v=vals[f.properties.code]; return v==null||v===0&&state.view!=="women"? "url(#hatch)" : ramp(sc(v));})
-    .classed("sel",f=>f.properties.code===state.dept).attr("aria-label",f=>dn(f.properties.code));
-  gL.selectAll("text").text(f=>dn(f.properties.code));
+  const Z=state.dept, changed=Z!==zoomedDept;
+  gD.selectAll("path").attr("fill",f=>{ if(Z&&f.properties.code===Z) return "#eef2f6"; const v=vals[f.properties.code]; return v==null||v===0&&state.view!=="women"? "url(#hatch)" : ramp(sc(v));})
+    .classed("sel",f=>f.properties.code===Z&&!Z).attr("aria-label",f=>dn(f.properties.code))
+    .attr("filter",f=>Z&&f.properties.code===Z?"url(#lift)":null)
+    .style("pointer-events",f=>!Z||f.properties.code===Z?null:"none");
+  gD.selectAll("path").transition().duration(changed?650:0).style("opacity",f=>!Z||f.properties.code===Z?1:0);
+  gL.selectAll("text").text(f=>dn(f.properties.code)).transition().duration(changed?400:0).style("opacity",Z?0:1);
   // Bulles
   let B=[];
   if(key&&UNIT[key]&&state.bubbles){
@@ -350,11 +392,35 @@ function renderMap(){
       B=Object.entries(D.communes).map(([k,v])=>({id:"com:"+k,u:"com",k,lat:v[4],lon:v[5],n:set[k]?.size||0,d:v[2]})); }
     B=B.filter(b=>b.lat!=null);
   }
-  const r=d3.scaleSqrt().domain([0,d3.max(B,b=>b.n)||1]).range([0,13]);
-  gB.selectAll("circle").data(B.sort((a,b)=>b.n-a.n),b=>b.id).join("circle").attr("class",b=>"b"+(b.n||state.phase==="depot"?"":" zero")+(state.unit&&state.unit.id===b.id?" sel":""))
-    .attr("cx",b=>proj([b.lon,b.lat])[0]).attr("cy",b=>proj([b.lon,b.lat])[1]).attr("r",b=>b.n?Math.max(2.5,r(b.n)):3)
+  const r=d3.scaleSqrt().domain([0,d3.max(B,b=>b.n)||1]).range([0,Z?22:13]);
+  if(Z) B=B.filter(b=>b.d===Z);
+  B.forEach(b=>{ const p=proj([b.lon,b.lat]); b._x=p[0]; b._y=p[1]; b._r=b.n?Math.max(Z?4:2.5,r(b.n)):(Z?5:3); });
+  const circ=gB.selectAll("circle").data(B.sort((a,b)=>b.n-a.n),b=>b.id).join("circle").attr("class",b=>"b"+(b.n||state.phase==="depot"?"":" zero")+(state.unit&&state.unit.id===b.id?" sel":""))
+    .attr("cx",b=>b._x).attr("cy",b=>b._y).attr("r",b=>b._r/curK)
     .on("mousemove",(e,b)=>bubbleTip(e,b)).on("mouseleave",()=>tip.style.opacity=0)
     .on("click",(e,b)=>{e.stopPropagation(); state.dept=b.d; state.unit={id:b.id,u:b.u,k:b.k}; render(); scrollDetail();});
+  // Points et noms des communes / circonscriptions quand un département est ouvert
+  let P=[];
+  if(Z){
+    if(B.length) P=B;
+    else P=Object.entries(D.communes).filter(([k,v])=>v[2]===Z&&v[4]!=null).map(([k,v])=>{const p=proj([v[5],v[4]]); return {id:"pt:"+k,u:"com",k,_x:p[0],_y:p[1],_r:2.2};});
+  }
+  gP.selectAll("circle").data(B.length?[]:P,b=>b.id).join("circle").attr("class","pt").attr("cx",b=>b._x).attr("cy",b=>b._y).attr("r",2.2/curK);
+  if(Z) declutter(P,zoomK(Z));
+  gC.selectAll("text").data(P,b=>b.id).join("text").attr("class","cl").attr("y",b=>b._y).text(b=>unitName(b.u,b.k)).style("display",b=>b._lab?null:"none");
+  applyK();
+  if(changed){
+    zoomTo(Z, zoomedDept!==undefined);
+    // Effet d'entrée : les bulles grandissent l'une après l'autre, les noms apparaissent ensuite
+    const pop=d3.easeBackOut.overshoot(1.6);
+    circ.each(b=>b._s=0).attr("r",0).transition().delay((b,i)=>Z?450+i*35:250+i*4).duration(550).ease(d3.easeLinear)
+      .tween("pop",function(b){ const el=this; return tt=>{ b._s=pop(tt); el.setAttribute("r",b._r*b._s/curK); }; });
+    gP.selectAll("circle").style("opacity",0).transition().delay((b,i)=>450+i*20).duration(350).style("opacity",1);
+    gC.selectAll("text").style("opacity",0).transition().delay((b,i)=>750+i*25).duration(400).style("opacity",1);
+    zoomedDept=Z;
+  }
+  const zb=document.getElementById("zoombar"); zb.classList.toggle("on",!!Z);
+  document.getElementById("zoomOut").textContent=t("allMap"); document.getElementById("zoomTitle").textContent=Z?dn(Z):"";
   // Légende
   const lg=document.getElementById("legend"); const g=RAMP[state.view];
   let h=`<span>${state.view==="count"||state.view==="perSeat"?t("legendLow"):"0 %"}</span><span class="grad" style="background:linear-gradient(90deg,${g[0]},${g[1]})"></span><span>${state.view==="count"||state.view==="perSeat"?t("legendHigh"):(state.view==="depot"?"100 %":pc(hi,1,0))}</span>`;
@@ -372,7 +438,7 @@ function deptTip(e,d){
 }
 function bubbleTip(e,b){ const key=mapKey();
   tip.innerHTML=`<b>${esc(unitName(b.u,b.k))}</b><div class="r"><span>${esc(dn(b.d))}</span></div><div class="r"><span>${b.u==="circ"?t("cands"):t("cartels")}</span><span>${b.n}</span></div>`; placeTip(e); }
-function selectDept(d){ state.unit=null; state.dept=state.dept===d?null:d; render(); scrollDetail(); }
+function selectDept(d){ state.unit=null; state.dept= d==null||state.dept===d ? null : d; tip.style.opacity=0; render(); scrollDetail(); }
 function scrollDetail(){ if(state.dept&&window.innerWidth<860) document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"start"}); }
 
 /* ---------------- Panneau de détail ---------------- */
@@ -492,6 +558,8 @@ document.getElementById("parties").addEventListener("click",e=>{const h=e.target
 document.getElementById("lSearch").addEventListener("input",e=>{state.lq=e.target.value; state.page=0; renderList();});
 document.getElementById("lDept").addEventListener("change",e=>{state.ld=e.target.value; state.page=0; renderList();});
 document.getElementById("pager").addEventListener("click",e=>{const b=e.target.closest("[data-pg]"); if(!b) return; state.page+= +b.dataset.pg; renderList();});
+document.getElementById("zoomOut").addEventListener("click",()=>selectDept(null));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&state.dept) selectDept(null); });
 const fromHash=()=>{const h=location.hash.slice(1); if(["all",...POSKEYS].includes(h)) state.tab=h;};
 window.addEventListener("hashchange",()=>{fromHash(); state.unit=null; render();});
 fromHash(); render();
