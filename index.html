@@ -186,7 +186,7 @@ fr:{title:"Candidatures — Élections générales 2026",subtitle:"Haïti · Sta
  all:"Ensemble",president:"Président",senat:"Sénat",depute:"Députés",maire:"Maires",casec:"CASEC",asec:"ASEC",
  online:"Inscriptions en ligne",depot:"Dossiers déposés",dataAt:"Données au",source:"Source : site web du CEP",
  cands:"Candidats",cartels:"Cartels",women:"Femmes",structures:"Structures politiques",withdrawn:"Retirés depuis le début",
- covered:"{u} avec au moins un candidat",emptyDepot:"{u} sans dossier déposé",allMap:"← Toute la carte",colPost:"Poste",empty:"{u} sans candidat",ofTotal:"sur {n}",perSeat:"Candidats par siège",perUnit:"Cartels par {u}",
+ covered:"{u} avec au moins un candidat",emptyDepot:"{u} sans dossier déposé",allMap:"← Toute la carte",authKpi:"Partis et groupements ont présenté des candidats / autorisés à le faire",authSub:"Autorisés : {p} partis et {g} groupements ayant enregistré 30 000 adhérents (CEP, 9 nov. 2026)",indepSub:"+ {a} candidats indépendants sur {b} autorisés",colPost:"Poste",empty:"{u} sans candidat",ofTotal:"sur {n}",perSeat:"Candidats par siège",perUnit:"Cartels par {u}",
  depositsKpi:"Dossiers déposés",depositsPending:"Le dépôt physique des dossiers n'a pas encore commencé dans les données. Cette section se remplira automatiquement dès que des dossiers seront marqués comme déposés.",
  noDeposits:"Aucun dossier déposé pour l'instant.",
  vCount:"Nombre",vPerSeat:"Par siège",vWomen:"% femmes",vDepot:"% déposés",bubbles:"Bulles",
@@ -208,7 +208,7 @@ ht:{title:"Kandidati — Eleksyon jeneral 2026",subtitle:"Ayiti · Estatistik en
  all:"Tout ansanm",president:"Prezidan",senat:"Sena",depute:"Depite",maire:"Majistra",casec:"KASEK",asec:"ASEK",
  online:"Enskripsyon an liy",depot:"Dosye depoze",dataAt:"Done nan dat",source:"Sous : sit entènèt CEP",
  cands:"Kandida",cartels:"Katèl",women:"Fanm",structures:"Estrikti politik",withdrawn:"Retire depi kòmansman",
- covered:"{u} ki gen omwen yon kandida",emptyDepot:"{u} san dosye depoze",allMap:"← Tout kat la",colPost:"Pòs",empty:"{u} san kandida",ofTotal:"sou {n}",perSeat:"Kandida pa syèj",perUnit:"Katèl pa {u}",
+ covered:"{u} ki gen omwen yon kandida",emptyDepot:"{u} san dosye depoze",allMap:"← Tout kat la",authKpi:"Pati ak gwoupman ki prezante kandida / ki otorize fè sa",authSub:"Otorize : {p} pati ak {g} gwoupman ki anrejistre 30 000 manm (CEP, 9 nov. 2026)",indepSub:"+ {a} kandida endepandan sou {b} ki otorize",colPost:"Pòs",empty:"{u} san kandida",ofTotal:"sou {n}",perSeat:"Kandida pa syèj",perUnit:"Katèl pa {u}",
  depositsKpi:"Dosye depoze",depositsPending:"Depo fizik dosye yo poko kòmanse nan done yo. Seksyon sa a ap ranpli otomatikman depi yo make dosye kòm depoze.",
  noDeposits:"Pa gen dosye depoze pou kounye a.",
  vCount:"Kantite",vPerSeat:"Pa syèj",vWomen:"% fanm",vDepot:"% depoze",bubbles:"Boul",
@@ -231,6 +231,9 @@ const DEPTS={OU:{fr:"Ouest",ht:"Lwès"},AR:{fr:"Artibonite",ht:"Latibonit"},ND:{
  CE:{fr:"Centre",ht:"Sant"},SD:{fr:"Sud",ht:"Sid"},SE:{fr:"Sud-Est",ht:"Sidès"},GA:{fr:"Grand'Anse",ht:"Grandans"},NI:{fr:"Nippes",ht:"Nip"}};
 const DCODES=Object.keys(DEPTS);
 const POSKEYS=["president","senat","depute","maire","casec","asec"];
+/* Structures habilitées à présenter des candidats (30 000 adhérents) — CEP, note de presse du 9 novembre 2026 */
+const AUTH={total:48,partis:31,groupements:17,indep:3};
+const isIndep=st=>/^CI-/.test(st);
 const POSCOL={all:"#1d4e89",president:"#7b3fbf",senat:"#0f8b8d",depute:"#e4572e",maire:"#2f7fd8",casec:"#e0a100",asec:"#3b9b57"};
 const KCOL=["#1d4e89","#e4572e","#0f8b8d","#e0a100","#7b3fbf","#3b9b57","#d6336c"];
 /* Couleurs des structures : les 12 plus importantes ont leur propre couleur, les autres sont en gris */
@@ -273,7 +276,7 @@ const uLabel=(u,plural)=>t({circ:plural?"uCircs":"uCirc",com:plural?"uComs":"uCo
 /* ---------------- Statistiques ---------------- */
 function stats(key,dept){
   let c=pool(key); if(dept) c=c.filter(x=>x[DP]===dept);
-  const s={n:c.length,f:c.filter(x=>x[SX]==="F").length,struct:new Set(c.map(x=>x[ST])).size,c};
+  const s={n:c.length,f:c.filter(x=>x[SX]==="F").length,struct:new Set(c.map(x=>x[ST]).filter(x=>!isIndep(x))).size,c};
   if(key==="maire"||key==="casec"||key==="asec") s.cartels=new Set(c.map(cartelKey)).size;
   const u=UNIT[key];
   if(u){ const all=dept?(UNITS[u][dept]||[]):DCODES.flatMap(d=>UNITS[u][d]||[]); const with_=new Set(c.map(x=>x[G]).filter(g=>u!=="sec"||D.sections[g]));
@@ -317,7 +320,8 @@ function renderKpis(){
     const allOnline=POSKEYS.reduce((a,k)=>a+D.pos[k].c.length,0);
     el.innerHTML=`<div class="kpis">${kpi(fmt(all.length),t("cands"),POSKEYS.map(k=>`<span style="color:${POSCOL[k]};font-weight:700">●</span> ${t(k)} ${fmt(pool(k).length)}`).join(" · "))}
       ${kpi(pc(f,all.length),t("women"),`${fmt(f)} ${t("candidates")}`)}
-      ${kpi(fmt(new Set(all.map(x=>x[ST])).size),t("structures"))}
+      ${(()=>{ const st=new Set(all.map(x=>x[ST])); const nS=[...st].filter(x=>!isIndep(x)).length, nI=[...st].filter(isIndep).length;
+         return kpi(`${nS} <span style="font-size:20px;opacity:.7">/ ${AUTH.total}</span>`,t("authKpi"),t("authSub",{p:AUTH.partis,g:AUTH.groupements})+`<br>${t("indepSub",{a:nI,b:AUTH.indep})}`); })()}
       ${kpi(fmt(dep),t("depositsKpi"),pc(dep,allOnline)+" "+t("ofTotal",{n:fmt(allOnline)}))}</div>${pend}`;
     return;
   }
@@ -326,7 +330,7 @@ function renderKpis(){
   if(s.cartels!=null) h+=kpi(fmt(s.cartels),t("cartels"),t("perUnit",{u:uLabel(u)})+" : "+(s.cartels/s.units).toLocaleString("fr-FR",{maximumFractionDigits:1}));
   else if(u) h+=kpi((s.n/s.units).toLocaleString("fr-FR",{maximumFractionDigits:1}),t("perSeat"),`${fmt(s.units)} ${uLabel(u,true)}`);
   h+=kpi(pc(s.f,s.n),t("women"),`${fmt(s.f)} / ${fmt(s.n)}`);
-  h+=kpi(fmt(s.struct),t("structures"));
+  h+=kpi(`${s.struct} <span style="font-size:20px;opacity:.7">/ ${AUTH.total}</span>`,t("authKpi"),t("authSub",{p:AUTH.partis,g:AUTH.groupements}));
   if(u) h+=kpi(fmt(s.units-s.covered),t(state.phase==="depot"?"emptyDepot":"empty",{u:cap(uLabel(u,true))}),t("ofTotal",{n:fmt(s.units)}),s.units-s.covered&&state.phase==="online"?"warn":"");
   h+=kpi(fmt(dk),t("depositsKpi"),pc(dk,allOnline));
   el.innerHTML=`<div class="kpis">${h}</div>${pend}`;
