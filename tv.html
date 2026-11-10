@@ -10,7 +10,25 @@
 <style>
 :root{--bg0:#050a16;--bg1:#0b1630;--panel:#0f1d3d;--panel2:#132650;--line:#21365f;--ink:#f3f6fb;--mut:#9fb0cc;--red:#e5162b;--gold:#ffb81c;--cyan:#2fb4ff}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:#000;overflow:hidden;color:var(--ink);font-family:"Barlow",system-ui,sans-serif}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;color:var(--ink);font-family:"Barlow",system-ui,sans-serif;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+/* ---- Commandes tactiles ---- */
+.touchbar{position:absolute;left:50%;bottom:112px;transform:translate(-50%,20px);z-index:12;display:flex;gap:12px;padding:10px;border-radius:999px;background:rgba(5,10,22,.92);border:1px solid var(--line);box-shadow:0 10px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
+.touchbar.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.touchbar button{width:92px;height:76px;border:0;border-radius:999px;background:#16295a;color:#fff;font:800 34px/1 "Barlow Condensed";letter-spacing:1px;cursor:pointer;transition:transform .12s,background .2s}
+.touchbar button.wide{width:120px;font-size:28px}
+.touchbar button:active{transform:scale(.92);background:var(--red)}
+.touchbar button.play{background:var(--red)}
+.deptbar{position:absolute;left:16px;right:16px;top:14px;display:flex;flex-wrap:nowrap;gap:6px;z-index:3}
+.deptbar button{border:1px solid #2a4a86;background:rgba(10,22,48,.88);color:#dfe8f7;font:700 19px "Barlow Condensed";letter-spacing:.5px;text-transform:uppercase;padding:9px 0;flex:1 1 auto;white-space:nowrap;border-radius:4px;cursor:pointer;transition:background .2s,transform .12s}
+.deptbar button:active{transform:scale(.94)}
+.deptbar button.on{background:var(--gold);border-color:var(--gold);color:#0a1430}
+.callout{position:absolute;z-index:4;min-width:300px;background:rgba(5,10,22,.96);border:1px solid var(--gold);border-left:6px solid var(--gold);border-radius:6px;padding:14px 18px;pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
+.callout.on{opacity:1;transform:none}
+.callout h4{font:800 32px "Barlow Condensed";text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.callout .r{display:flex;justify-content:space-between;gap:24px;font:700 22px "Barlow Condensed";letter-spacing:1px;text-transform:uppercase}
+.callout .r b{font-size:26px;color:#fff}
+.callout .warn{margin-top:8px;font:700 20px "Barlow Condensed";color:#ff5a6a;letter-spacing:1px;text-transform:uppercase}
+.progress{cursor:pointer}
 .cond{font-family:"Barlow Condensed","Arial Narrow",sans-serif}
 #stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
   background:radial-gradient(ellipse at 30% 20%,#13285a 0%,#0a1530 45%,#050a16 100%)}
@@ -71,7 +89,7 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;color:var(--ink
 .mapbox text.cl{font:600 15px "Barlow Condensed";fill:#fff;paint-order:stroke;stroke:#050a16;pointer-events:none;letter-spacing:.5px}
 .maplegend{position:absolute;left:24px;bottom:20px;display:flex;align-items:center;gap:12px;font:600 18px "Barlow Condensed";color:var(--mut);letter-spacing:1px;text-transform:uppercase}
 .maplegend .g{width:220px;height:12px;border-radius:2px;background:linear-gradient(90deg,#16336b,#2fb4ff)}
-.mapcorner{position:absolute;left:24px;top:20px;font:700 22px "Barlow Condensed";letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.mapcorner{position:absolute;left:24px;bottom:52px;font:700 22px "Barlow Condensed";letter-spacing:2px;color:var(--mut);text-transform:uppercase}
 .side{padding:26px 32px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
 .side h2{font:800 68px/0.95 "Barlow Condensed";text-transform:uppercase;letter-spacing:1px}
 .side .totalrow{display:flex;align-items:baseline;gap:16px}
@@ -140,7 +158,8 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;color:var(--ink
 
 /* ---- Bandeau du bas ---- */
 .lower{position:absolute;left:0;right:0;bottom:0;height:96px;z-index:5;display:flex;flex-direction:column}
-.progress{height:6px;background:rgba(255,255,255,.08);display:flex;gap:4px;padding:0 48px}
+.progress{height:6px;background:rgba(255,255,255,.08);display:flex;gap:4px;padding:0 48px;position:relative}
+.progress:before{content:"";position:absolute;left:0;right:0;top:-18px;bottom:-6px}
 .progress i{flex:1;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
 .progress i.on:after{content:"";position:absolute;inset:0;background:var(--gold);transform-origin:left;animation:fill var(--d) linear forwards}
 .progress i.done{background:rgba(255,184,28,.55)}
@@ -183,6 +202,7 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;color:var(--ink
   </div>
   <div class="wipe" id="wipe"><i></i><i></i><i></i></div>
   <div class="help" id="help"></div>
+  <div class="touchbar" id="touchbar"><button data-a="prev">◀</button><button data-a="play" class="play" id="tbPlay">❚❚</button><button data-a="next">▶</button><button data-a="lang" class="wide" id="tbLang">KREYÒL</button><button data-a="fs" class="wide">⛶</button></div>
 </div>
 
 <script>
@@ -204,7 +224,7 @@ fr:{sub:"Candidatures",live:"Données CEP",dataAt:"Données au",src:"Source : si
  gapTitle:"Sections communales sans candidat",gapNote:"sur {n} sections communales",mayorTitle:"Communes sans candidat à la mairie",gapBy:"Par département — sections sans candidat au CASEC",
  wTitle:"Part des femmes par poste",wNote:"Ligne jaune : quota de 30 %",wOverall:"des candidats sont des femmes",
  trendTitle:"Candidats publiés par le CEP, mise à jour après mise à jour",
- help:"<b>→ ←</b> scènes <b>Espace</b> pause / lecture <b>↑ ↓</b> départements <b>F</b> plein écran <b>L</b> kreyòl <b>H</b> aide",
+ help:"<b>→ ←</b> scènes <b>Espace</b> pause / lecture <b>↑ ↓</b> départements <b>F</b> plein écran <b>L</b> kreyòl <b>H</b> aide · tactile : touchez l\'écran pour les commandes, balayez pour changer de scène",
  paused:"PAUSE",
  t_total:"{n} candidats inscrits",t_women:"{p} de femmes parmi les candidats",t_auth:"{a} structures sur {b} habilitées présentent des candidats",
  t_noMayor:"{c} : aucun candidat à la mairie",t_casec:"{n} sections communales sans candidat au CASEC",t_asec:"{n} sections communales sans candidat à l'ASEC",
@@ -222,7 +242,7 @@ ht:{sub:"Kandidati",live:"Done CEP",dataAt:"Done nan dat",src:"Sous : sit entèn
  gapTitle:"Seksyon kominal san kandida",gapNote:"sou {n} seksyon kominal",mayorTitle:"Komin san kandida pou majistra",gapBy:"Pa depatman — seksyon san kandida pou KASEK",
  wTitle:"Pousantaj fanm pa pòs",wNote:"Liy jòn : kota 30 %",wOverall:"nan kandida yo se fanm",
  trendTitle:"Kandida CEP pibliye, mizajou apre mizajou",
- help:"<b>→ ←</b> sèn yo <b>Espas</b> poz / jwe <b>↑ ↓</b> depatman <b>F</b> plen ekran <b>L</b> franse <b>H</b> èd",
+ help:"<b>→ ←</b> sèn yo <b>Espas</b> poz / jwe <b>↑ ↓</b> depatman <b>F</b> plen ekran <b>L</b> franse <b>H</b> èd · tactil : touche ekran an pou kòmand yo, glise pou chanje sèn",
  paused:"POZ",
  t_total:"{n} kandida enskri",t_women:"{p} fanm nan kandida yo",t_auth:"{a} estrikti sou {b} ki otorize prezante kandida",
  t_noMayor:"{c} : pa gen kandida pou majistra",t_casec:"{n} seksyon kominal san kandida pou KASEK",t_asec:"{n} seksyon kominal san kandida pou ASEK",
@@ -320,11 +340,30 @@ function sNational(el){
 /* 2. Carte « mur interactif » */
 let mapState=null;
 function sMap(el){
-  el.innerHTML=`<div class="wall"><div class="panel mapbox in"><svg viewBox="0 0 1140 836"></svg><div class="mapcorner" id="mapCorner"></div>
+  el.innerHTML=`<div class="wall"><div class="panel mapbox in"><svg viewBox="0 0 1140 836"></svg><div class="deptbar" id="deptbar"></div><div class="mapcorner" id="mapCorner"></div><div class="callout" id="callout"></div>
      <div class="maplegend"><span>${t("ramp")}</span><span class="g"></span></div></div><div class="panel side in" id="side" style="animation-delay:.15s"></div></div>`;
   const W=1140,H=836; const svg=d3.select(el).select("svg");
   const proj=d3.geoMercator().fitExtent([[40,40],[W-40,H-70]],GEO), path=d3.geoPath(proj);
+  svg.append("rect").attr("width",W).attr("height",H).attr("fill","transparent").on("click",()=>{ hideCallout(); if(mapState.cur){ pauseAuto(); mapGo(null); } });
   const g=svg.append("g"), gD=g.append("g"), gB=g.append("g"), gC=g.append("g"), gL=g.append("g");
+  const db=document.getElementById("deptbar");
+  db.innerHTML=[null,...DCODES].map(d=>`<button data-d="${d||""}">${d?dn(d):t("haiti")}</button>`).join("");
+  db.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; pauseAuto(); hideCallout(); mapGo(b.dataset.d||null); });
+  const co=document.getElementById("callout");
+  function hideCallout(){ co.classList.remove("on"); }
+  function showCallout(b,ev){
+    const cnt={maire:0,casec:0,asec:0}; const cart=new Set();
+    LOCAL.forEach(k=>C[k].forEach(c=>{ if(comOf(k,c)===b.k){ cnt[k]++; if(k==="maire") cart.add(c[ST]); } }));
+    co.innerHTML=`<h4>${esc(comName(b.k))}</h4>
+      <div class="r"><span style="color:${PC.maire}">${t("maire")}</span><b>${cart.size} ${t("cartels")}</b></div>
+      <div class="r"><span style="color:${PC.casec}">${t("casec")}</span><b>${fmt(cnt.casec)}</b></div>
+      <div class="r"><span style="color:${PC.asec}">${t("asec")}</span><b>${fmt(cnt.asec)}</b></div>
+      ${b.nm?`<div class="warn">${t("noMayor").replace(/\(s\)/g,"")}</div>`:""}`;
+    const box=el.querySelector(".mapbox").getBoundingClientRect(), sc=box.width/1140;
+    let x=(ev.clientX-box.left)/sc+24, y=(ev.clientY-box.top)/sc-40;
+    if(x>W-340) x-=380; if(y>H-220) y=H-220; if(y<70) y=70;
+    co.style.left=x+"px"; co.style.top=y+"px"; co.classList.add("on");
+  }
   const max=d3.max(DCODES,d=>DEPT[d].total), col=d3.scaleLinear().domain([0,max]).range(["#16336b","#2fb4ff"]);
   gD.selectAll("path").data(GEO.features).join("path").attr("class","dept").attr("d",path).attr("fill",f=>col(DEPT[f.properties.code].total))
     .on("click",(e,f)=>{ pauseAuto(); mapGo(mapState.cur===f.properties.code?null:f.properties.code); });
@@ -352,7 +391,10 @@ function sMap(el){
     const bb=d? B.filter(b=>b.d===d):[];
     // déclutter des noms
     const kk=d?kFor(d).k:1, placed=[]; bb.slice().sort((a,b)=>b.n-a.n).forEach(b=>{ const x=b.x*kk+Math.max(4,r(b.n))+4, y=b.y*kk-9, w=comName(b.k).length*8.2, h=18; b.lab=!placed.some(q=>x<q.x+q.w&&x+w>q.x&&y<q.y+q.h&&y+h>q.y); if(b.lab) placed.push({x,y,w,h}); });
-    const cs=gB.selectAll("circle").data(bb,b=>b.k).join("circle").attr("class",b=>"cb"+(b.nm?" zero":"")).attr("cx",b=>b.x).attr("cy",b=>b.y);
+    const cs=gB.selectAll("circle").data(bb,b=>b.k).join("circle").attr("class",b=>"cb"+(b.nm?" zero":"")).attr("cx",b=>b.x).attr("cy",b=>b.y)
+      .style("cursor","pointer").on("click",(ev,b)=>{ ev.stopPropagation(); pauseAuto(); showCallout(b,ev); });
+    hideCallout();
+    db.querySelectorAll("button").forEach(x=>x.classList.toggle("on",(x.dataset.d||null)===d));
     cs.each(b=>b._s=0).attr("r",0).transition().delay((b,i)=>700+i*30).duration(600).ease(d3.easeLinear)
       .tween("pop",function(b){ const el=this, e=d3.easeBackOut.overshoot(1.7); return tt=>{ b._s=e(tt); el.setAttribute("r",Math.max(4,r(b.n))/k*b._s); }; });
     gC.selectAll("text").data(bb.filter(b=>b.lab),b=>b.k).join("text").attr("class","cl").attr("y",b=>b.y).text(b=>comName(b.k))
@@ -490,14 +532,29 @@ function schedule(){
 }
 function pauseAuto(){ if(!auto) return; auto=false; clearTimeout(timer); clearInterval(mapTimer); markProgress(); document.getElementById("liveTag").textContent=t("paused"); }
 function resume(){ auto=true; document.getElementById("liveTag").textContent=t("live"); show(cur+1); }
+/* ---- Tactile : barre de commandes, balayage, barre de progression ---- */
+const tb=document.getElementById("touchbar"); let tbT;
+function showBar(){ document.getElementById("help").classList.add("hide"); tb.classList.add("on"); document.getElementById("tbPlay").textContent=auto?"❚❚":"▶"; document.getElementById("tbLang").textContent=LANG==="fr"?"KREYÒL":"FRANÇAIS"; clearTimeout(tbT); tbT=setTimeout(()=>tb.classList.remove("on"),8000); }
+function toggleLang(){ LANG=LANG==="fr"?"ht":"fr"; try{localStorage.setItem("tvlang",LANG);}catch(_){}; chrome(); show(cur,true); if(!auto) document.getElementById("liveTag").textContent=t("paused"); }
+function toggleFS(){ const p=document.fullscreenElement? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); p?.catch?.(()=>{}); }
+tb.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; e.stopPropagation(); const a=b.dataset.a;
+  if(a==="prev") show(cur-1); else if(a==="next") show(cur+1); else if(a==="play") (auto?pauseAuto():resume()); else if(a==="lang") toggleLang(); else if(a==="fs") toggleFS();
+  showBar(); });
+stage.addEventListener("pointerdown",()=>showBar());
+document.addEventListener("contextmenu",e=>e.preventDefault());
+let sw=null;
+stage.addEventListener("pointerdown",e=>{ if(e.target.closest(".mapbox,.touchbar,.deptbar")) { sw=null; return; } sw={x:e.clientX,y:e.clientY,t:Date.now()}; });
+stage.addEventListener("pointerup",e=>{ if(!sw) return; const dx=e.clientX-sw.x, dy=e.clientY-sw.y; const sc=stage.getBoundingClientRect().width/1920;
+  if(Math.abs(dx)>120*sc && Math.abs(dx)>2*Math.abs(dy) && Date.now()-sw.t<800){ show(cur+(dx<0?1:-1)); } sw=null; });
+prog.addEventListener("click",e=>{ const r=prog.getBoundingClientRect(); const i=Math.floor((e.clientX-r.left)/r.width*SCENES.length); show(Math.max(0,Math.min(SCENES.length-1,i))); showBar(); });
 addEventListener("keydown",e=>{
   if(e.key==="ArrowRight"||e.key==="PageDown"){ show(cur+1); }
   else if(e.key==="ArrowLeft"||e.key==="PageUp"){ show(cur-1); }
   else if(e.key===" "){ e.preventDefault(); auto? pauseAuto() : resume(); }
   else if((e.key==="ArrowDown"||e.key==="ArrowUp")&&mapState){ e.preventDefault(); pauseAuto(); const s=mapState.seq; let j=s.indexOf(mapState.cur); j=(j+(e.key==="ArrowDown"?1:-1)+s.length)%s.length; mapState.go(s[j]); }
   else if(/^[0-9]$/.test(e.key)&&mapState){ pauseAuto(); mapState.go(e.key==="0"?null:DCODES[+e.key-1]); }
-  else if(e.key==="f"||e.key==="F"){ const el=document.documentElement; (document.fullscreenElement? document.exitFullscreen() : el.requestFullscreen?.())?.catch?.(()=>{}); }
-  else if(e.key==="l"||e.key==="L"){ LANG=LANG==="fr"?"ht":"fr"; try{localStorage.setItem("tvlang",LANG);}catch(_){}; chrome(); show(cur,true); if(!auto) document.getElementById("liveTag").textContent=t("paused"); }
+  else if(e.key==="f"||e.key==="F"){ toggleFS(); }
+  else if(e.key==="l"||e.key==="L"){ toggleLang(); }
   if(e.key==="h"||e.key==="H"||e.key==="?") showHelp();
 });
 let helpT; function showHelp(){ const h=document.getElementById("help"); h.classList.remove("hide"); clearTimeout(helpT); helpT=setTimeout(()=>h.classList.add("hide"),5000); }
